@@ -1,0 +1,252 @@
+openapi: 3.0.0
+info:
+  title: API de Gerenciamento de um Fake Fast-Food
+  description: API para gerenciar pedidos, produtos, categorias e usuários
+  version: 1.0.0
+  baseUrl: http://localhost:3000/api
+
+paths:
+  /orders:
+    get:
+      summary: Listar todos os pedidos
+      tags:
+        - Pedidos
+      responses:
+        '200':
+          description: Lista de pedidos
+
+    post:
+      summary: Criar novo pedido
+      tags:
+        - Pedidos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: Pedido criado com sucesso
+
+  /orders/{id}:
+    get:
+      summary: Buscar pedido por ID
+      tags:
+        - Pedidos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pedido encontrado
+
+  /product-categories:
+    get:
+      summary: Listar todas as categorias
+      tags:
+        - Categorias
+      responses:
+        '200':
+          description: Lista de categorias
+
+    post:
+      summary: Criar nova categoria de produto
+      tags:
+        - Categorias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Categoria criada com sucesso
+
+  /product-categories/{id}:
+    get:
+      summary: Buscar categoria por ID
+      tags:
+        - Categorias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Categoria encontrada
+
+  /products:
+    get:
+      summary: Listar todos os produtos
+      tags:
+        - Produtos
+      responses:
+        '200':
+          description: Lista de produtos
+
+    post:
+      summary: Criar novo produto
+      tags:
+        - Produtos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Produto criado com sucesso
+
+  /products/{id}:
+    get:
+      summary: Buscar produto por ID
+      tags:
+        - Produtos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Produto encontrado
+          
+    put:
+      summary: Atualizar produto
+      tags:
+        - Produtos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Produto atualizado
+          
+    delete:
+      summary: Deletar produto
+      tags:
+        - Produtos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Produto deletado
+
+  /products/category/{categoryId}:
+    get:
+      summary: Buscar produtos por categoria
+      tags:
+        - Produtos
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de produtos da categoria
+
+  /users:
+    post:
+      summary: Criar novo usuário
+      tags:
+        - Usuários
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+
+  /users/{cpf}:
+    get:
+      summary: Buscar usuário por CPF
+      tags:
+        - Usuários
+      parameters:
+        - name: cpf
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuário encontrado
+
+components:
+  schemas:
+    OrderInput:
+      type: object
+      properties:
+        userId:
+          type: string
+          nullable: true
+        total:
+          type: number
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID do produto
+              quantity:
+                type: number
+                description: Quantidade do produto
+
+    CategoryInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    ProductInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        categoryId:
+          type: number
+
+    UserInput:
+      type: object
+      properties:
+        name:
+          type: string
+        cpf:
+          type: string
+        email:
+          type: string
