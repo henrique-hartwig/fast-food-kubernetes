@@ -7,8 +7,8 @@ const orderService = new OrderService(orderRepository);
 export class OrderController {
   async createOrder(req: any, res: any) {
     const { items, total, userId } = req.body;
-    await orderService.createOrder(items, total, userId);
-    res.status(201).json({ message: 'Order created successfully!' });
+    const order = await orderService.createOrder(items, total, userId);
+    res.status(201).json(order);
   }
 
   async getOrderById(req: any, res: any) {

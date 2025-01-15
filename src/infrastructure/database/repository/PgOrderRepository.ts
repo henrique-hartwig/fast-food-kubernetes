@@ -3,13 +3,14 @@ import type { IOrderRepository } from '../../../application/ports/IOrderReposito
 import { Order } from '../../../domain/entities/Order';
 
 export class PgOrderRepository implements IOrderRepository {
-  async save(order: Order): Promise<void> {
-    await prisma.order.create({
+  async save(order: Order): Promise<Order> {
+    const createdOrder = await prisma.order.create({
       data: {
         items: order.items,
         total: order.total,
       },
     });
+    return new Order(createdOrder.id, createdOrder.items as { id: number; quantity: number }[], createdOrder.total, createdOrder.status as Order['status'], createdOrder.userId ?? undefined);
   }
 
   async findById(id: number): Promise<Order | null> {
