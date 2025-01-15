@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
@@ -9,22 +9,22 @@ datasource db {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  name      String
-  email     String @unique
-  cpf       String @unique
-  orders    Order[]
+  id     Int     @id @default(autoincrement())
+  name   String
+  email  String  @unique
+  cpf    String  @unique
+  orders Order[]
 }
 
 model Product {
-  id              Int             @id @default(autoincrement())
-  name            String
-  description     String
-  price           Float
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  categoryId      Int
-  category        ProductCategory @relation(fields: [categoryId], references: [id])
+  id          Int             @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  categoryId  Int
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
 }
 
 model ProductCategory {
@@ -45,4 +45,16 @@ model Order {
   status    String    @default("received")
   userId    Int?
   user      User?     @relation(fields: [userId], references: [id])
+  Payment   Payment[]
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  orderId       Int
+  order         Order    @relation(fields: [orderId], references: [id])
+  status        String
+  paymentMethod String
+  amount        Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
