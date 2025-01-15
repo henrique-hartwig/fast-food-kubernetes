@@ -27,7 +27,8 @@ The endpoints are for:
 3. Run `bun run migrate` to run the migrations
 4. Run `bun run seed` to run the seed
 5. You can use Postman or any other API client to test the endpoints.
-
+ 
+ Example: GET http://localhost:3000/api/products
 
 
 ## Folders structure
