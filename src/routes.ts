@@ -5,8 +5,13 @@ import { ProductController } from './infrastructure/http/ProductController';
 import { UserController } from './infrastructure/http/UserController';
 
 const router = Router();
-const orderController = new OrderController();
 
+router.get('/health', (req, res) => {
+    console.log('Checking the health of the application');
+    res.status(200).send('The application is running');
+});
+
+const orderController = new OrderController();
 router.post('/orders', orderController.createOrder);
 router.get('/orders', orderController.getAllOrders);
 router.get('/orders/:id', orderController.getOrderById);
