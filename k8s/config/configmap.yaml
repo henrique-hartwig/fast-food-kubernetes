@@ -5,4 +5,4 @@ metadata:
 data:
   POSTGRES_USER: "admin"
   POSTGRES_DB: "fastfood"
-  DATABASE_URL: postgresql://admin:${DATABASE_PASSWORD}@postgres-service-internal:5432/fastfood
+  DATABASE_URL: postgresql://admin@postgres-service-internal:5432/fastfood

@@ -62,9 +62,8 @@ Deployment:
  Example: GET http://localhost:30000/api/products
 
 
-Important Note:
-- Since its a fake application for studies purposes, the application is not using a real secret manager like Vaulkt from Hashicorp or AWS Secrets Manager. So this way anyone can deploy the application and use it.
-
+Important Notes:
+- Using simple Opaque secrets to store the database password.
 
 ## Folders structure
 This project aims to use Hexagonal Architecture, so the following folders structure is composed by Ports and Adapters. The Ports work as interfaces/contracts to asure the attributes and methods to interact with other part. The Adapters are the real implementaion of Ports and these Adapters are present in every part of hexagonal architecture.
