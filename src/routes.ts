@@ -10,7 +10,7 @@ const router = Router();
 
 const healthController = new HealthController();
 router.get('/health', healthController.healthCheck);
-router.get('/readiness', healthController.readinessCheck);
+router.get('/ready', healthController.readinessCheck);
 
 const orderController = new OrderController();
 router.post('/orders', orderController.createOrder);

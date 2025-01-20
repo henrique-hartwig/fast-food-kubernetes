@@ -29,7 +29,7 @@ echo ""
 
 echo "🌱 Executing seed..."
 kubectl apply -f k8s/jobs/seed-job.yaml
-# kubectl wait --for=condition=complete job/seed-job --timeout=30s
+kubectl wait --for=condition=complete job/seed-job --timeout=30s
 echo ""
 
 echo "🚀 Deploying application..."
@@ -37,8 +37,7 @@ kubectl apply -f k8s/api/app-deployment.yaml
 kubectl apply -f k8s/api/app-service.yaml
 echo ""
 
-echo "✅ Deployment finished!"
-MINIKUBE_IP=$(minikube ip)
-echo "🌐 Application will be available at http://${MINIKUBE_IP}:30000 in a few moments..."
-echo "💡 To access the application via localhost, execute: kubectl port-forward svc/fastfood-service 3000:3000" 
-echo "💡 Then go to http://localhost:3000"
+echo "✅ Deployment finished! Waiting to minikube service to be ready..."
+kubectl wait --for=condition=ready pod -l app=fastfood-service --timeout=20s
+MINIKUBE_IP=$(minikube service fastfood-service --url)
+echo "🌐 Application will be available at ${MINIKUBE_IP} in a few moments..."
