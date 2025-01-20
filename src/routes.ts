@@ -3,10 +3,16 @@ import { OrderController } from './infrastructure/http/OrderController';
 import { ProductCategoryController } from './infrastructure/http/ProductCategoryController';
 import { ProductController } from './infrastructure/http/ProductController';
 import { UserController } from './infrastructure/http/UserController';
+import { HealthController } from './infrastructure/http/HealthController';
+
 
 const router = Router();
-const orderController = new OrderController();
 
+const healthController = new HealthController();
+router.get('/health', healthController.healthCheck);
+router.get('/readiness', healthController.readinessCheck);
+
+const orderController = new OrderController();
 router.post('/orders', orderController.createOrder);
 router.get('/orders', orderController.getAllOrders);
 router.get('/orders/:id', orderController.getOrderById);
