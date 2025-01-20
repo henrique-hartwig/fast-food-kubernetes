@@ -1,11 +1,11 @@
-import { Payment, type PaymentMethod, type PaymentStatus } from "../../domain/entities/Payment";
+import type { Payment, PaymentMethod, PaymentStatus } from "../../domain/entities/Payment";
 import type { IPaymentRepository } from "../ports/IPaymentRepository";
 
 export class PaymentService {
     constructor(private readonly paymentRepository: IPaymentRepository) {}
 
     async createPayment(orderId: number, status: PaymentStatus, paymentMethod: PaymentMethod, amount: number): Promise<Payment> {
-        const payment = new Payment(0, orderId, status, paymentMethod, amount);
+        const payment = new Payment(orderId, status, paymentMethod, amount);
         return this.paymentRepository.save(payment);
     }
 
@@ -17,12 +17,7 @@ export class PaymentService {
         return this.paymentRepository.findAll();
     }
 
-    async updatePaymentStatus(orderId: number, status: PaymentStatus): Promise<Payment> {
-        const payment = await this.paymentRepository.findByOrderId(orderId);
-        if (!payment) {
-          throw new Error('Payment not found');
-        }
-        payment.status = status;
-        return this.paymentRepository.save(payment);
-      }
+    async updatePayment(payment: Payment): Promise<Payment> {
+        return this.paymentRepository.update(payment);
+    }
 }

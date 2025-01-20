@@ -42,7 +42,7 @@ model Order {
   total     Float
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  status    String    @default("pending")
+  status    String    @default("received")
   userId    Int?
   user      User?     @relation(fields: [userId], references: [id])
   Payment   Payment[]
@@ -50,7 +50,7 @@ model Order {
 
 model Payment {
   id            Int      @id @default(autoincrement())
-  orderId       Int      @unique
+  orderId       Int
   order         Order    @relation(fields: [orderId], references: [id])
   status        String
   paymentMethod String

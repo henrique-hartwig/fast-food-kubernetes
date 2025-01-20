@@ -1,6 +1,6 @@
 import prisma from '../prisma/prismaClient';
 import type { IOrderRepository } from '../../../application/ports/IOrderRepository';
-import { Order, type OrderStatus } from '../../../domain/entities/Order';
+import { Order } from '../../../domain/entities/Order';
 
 export class PgOrderRepository implements IOrderRepository {
   async save(order: Order): Promise<Order> {
@@ -28,13 +28,5 @@ export class PgOrderRepository implements IOrderRepository {
   async findAll(): Promise<Order[]> {
     const ordersData = await prisma.order.findMany();
     return ordersData.map(order => new Order(order.id, order.items as { id: number; quantity: number }[], order.total, order.status as Order['status'], order.userId ?? undefined));
-  }
-
-  async updateStatus(orderId: number, status: OrderStatus): Promise<Order> {
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status },
-    });
-    return new Order(updatedOrder.id, updatedOrder.items as { id: number; quantity: number }[], updatedOrder.total, updatedOrder.status as Order['status'], updatedOrder.userId ?? undefined);
   }
 }

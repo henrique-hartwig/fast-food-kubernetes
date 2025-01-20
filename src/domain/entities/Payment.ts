@@ -1,5 +1,5 @@
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cancelled';
-export type PaymentMethod = 'credit_card' | 'debit_card' | 'pix' | 'cash';
+export type PaymentMethod = 'credit_card' | 'debit_card' | 'pix' | 'billet';
 
 export class Payment {
     constructor(

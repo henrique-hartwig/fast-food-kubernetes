@@ -1,8 +1,8 @@
-import type { Payment, PaymentStatus } from "../../domain/entities/Payment";
+import type { Payment } from "../../domain/entities/Payment";
 
 export interface IPaymentRepository {
     save(payment: Payment): Promise<Payment>;
     findByOrderId(orderId: number): Promise<Payment | null>;
     findAll(): Promise<Payment[]>;
-    updateStatus(orderId: number, status: PaymentStatus): Promise<Payment>;
+    update(payment: Payment): Promise<Payment>;
 }
