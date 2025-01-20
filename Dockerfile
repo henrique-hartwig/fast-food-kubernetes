@@ -6,7 +6,11 @@ COPY package.json bun.lockb* ./
 
 RUN bun install
 
-COPY . .
+COPY src/ ./src
+COPY tsconfig.json ./
+COPY .env ./
+
+RUN bunx prisma generate --schema=./src/infrastructure/database/prisma/schema.prisma
 
 EXPOSE 3000
 
