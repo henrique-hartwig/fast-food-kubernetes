@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migration-job
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+      - name: migration
+        image: henriquemh/fastfood-app:latest
+        command: 
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for PostgreSQL to be ready..."
+          sleep 10
+          export DATABASE_URL="postgresql://admin:$(DATABASE_PASSWORD)@postgres-service-internal:5432/fastfood"
+          bun run migrate
+        env:
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: database_password
+      restartPolicy: OnFailure

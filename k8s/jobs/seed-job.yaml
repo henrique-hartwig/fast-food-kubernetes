@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: seed
+        image: henriquemh/fastfood-app:latest
+        command: 
+        - /bin/sh
+        - -c
+        - |
+          export DATABASE_URL="postgresql://admin:$(DATABASE_PASSWORD)@postgres-service-internal:5432/fastfood"
+          bun run generate
+          bun run seed
+        env:
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret
+                key: database_password
+      restartPolicy: OnFailure
