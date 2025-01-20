@@ -6,6 +6,7 @@
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
     "lint": "eslint --fix .",
+    "generate": "bunx prisma generate --schema=./src/infrastructure/database/prisma/schema.prisma",
     "migrate": "bunx prisma migrate dev --schema=./src/infrastructure/database/prisma/schema.prisma",
     "seed": "bun src/infrastructure/database/prisma/seed.ts"
   },

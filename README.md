@@ -1,8 +1,9 @@
 # Fast-Food Backend
-SOAT Tech Challenge 1 - Backend for Fake Fast-Food restaurant
+SOAT Tech Challenge 2 - Improving the Fast-Food Backend
 
+This is the second version of the Fake Fast-Food Backend. It is a simplified backend for a fake Fast-Food restaurant that will be a monolitic application and relational Database.
+At this thime, I've changed the architecture from Hexagonal to Clean Architecture. Also, the deployment won't be with Docker Compose, but with Kubernetes.
 
-This is the first version of the Fake Fast-Food Backend. It is a simplified backend for a fake Fast-Food restaurant that will be a monolitic application and relational Database.
 The endpoints are for:
 
 - Create, read, update users
@@ -15,20 +16,54 @@ The endpoints are for:
 
 
 ## Technologies
+Application:
 - [Bun](https://bun.sh/) - Package manager
 - [Express](https://expressjs.com/) - Web framework
 - [Prisma](https://www.prisma.io/) - ORM
+- [PostgreSQL](https://www.postgresql.org/) - Database
 
+
+Deployment:
+- [Docker](https://www.docker.com/) - Containerization
+- [Kubernetes](https://kubernetes.io/) - Container orchestration
+- [Minikube](https://minikube.sigs.k8s.io/docs/) - Local Kubernetes cluster
 
 
 ## How to run
 1. Clone the repository
-2. Run `docker compose up -d` to start the database and application services
-3. Run `bun run migrate` to run the migrations
-4. Run `bun run seed` to run the seed
-5. You can use Postman or any other API client to test the endpoints.
+2. Setup minikube to use docker as driver and start the cluster
+   ```bash
+   minikube start --driver=docker
+   ```
+   or if already have minikube installed
+
+   ```bash
+   minikube start
+   ```
+3. To deploy the application, execute:
+   ```bash
+   ./deploy.sh
+   ```
+   This script will:
+   - Create the ConfigMap with environment variables
+   - Configure the storage (StorageClass, PV and PVC)
+   - Deploy the database
+   - Execute the migrations
+   - Execute the seed data
+   - Deploy the application locally with minikube
+
+3. To remove all resources, execute:
+   ```bash
+   ./undeploy.sh
+   ```
+   
+4. You can use Postman or any other API client to test the endpoints through the NodePort configured at http://localhost:30000
  
- Example: GET http://localhost:3000/api/products
+ Example: GET http://localhost:30000/api/products
+
+
+Important Note:
+- Since its a fake application for studies purposes, the application is not using a real secret manager like Vaulkt from Hashicorp or AWS Secrets Manager. So this way anyone can deploy the application and use it.
 
 
 ## Folders structure
