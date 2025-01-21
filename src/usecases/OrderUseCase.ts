@@ -17,4 +17,20 @@ export class OrderUseCase {
   async getAllOrders(): Promise<Order[]> {
     return this.orderRepository.findAll();
   }
+
+  async getOpenOrders(): Promise<Order[]> {
+    const query = `
+        SELECT * FROM public."Order" 
+        WHERE status IN ('received', 'in_preparation', 'ready') 
+        ORDER BY 
+            CASE status 
+                WHEN 'ready' THEN 1
+                WHEN 'in_preparation' THEN 2
+                WHEN 'received' THEN 3
+            END,
+            "createdAt" ASC
+    `;
+    const orders = await this.orderRepository.query(query);
+    return orders;
+  }
 }

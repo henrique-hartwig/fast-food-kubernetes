@@ -38,9 +38,9 @@ export class OrderController {
     }
   }
 
-  async getAllOrders(req: Request, res: Response): Promise<void> {
+  async getAllOrders(_req: Request, res: Response): Promise<void> {
     try {
-      const orders = await this.orderUseCase.getAllOrders();
+      const orders = await this.orderUseCase.getOpenOrders();
       res.status(200).json(orders);
     } catch (error: any) {
       console.error('Error searching orders:', error);
@@ -60,7 +60,7 @@ export class OrderController {
       );
     } catch (error) {
       console.error('Failed to create payment:', error);
-      throw error; // Propagar o erro para que a criação do pedido também falhe
+      throw error;
     }
   }
 }
