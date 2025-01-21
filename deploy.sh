@@ -29,15 +29,15 @@ echo ""
 
 echo "🌱 Executing seed..."
 kubectl apply -f k8s/jobs/seed-job.yaml
-kubectl wait --for=condition=complete job/seed-job --timeout=30s
 echo ""
 
 echo "🚀 Deploying application..."
 kubectl apply -f k8s/api/app-deployment.yaml
 kubectl apply -f k8s/api/app-service.yaml
+kubectl apply -f k8s/api/app-hpa.yaml
 echo ""
 
 echo "✅ Deployment finished! Waiting to minikube service to be ready..."
-kubectl wait --for=condition=ready pod -l app=fastfood-service --timeout=20s
+kubectl wait --for=condition=ready pod -l app=fastfood-app --timeout=60s
 MINIKUBE_IP=$(minikube service fastfood-service --url)
 echo "🌐 Application will be available at ${MINIKUBE_IP} in a few moments..."
