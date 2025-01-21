@@ -1,11 +1,10 @@
-import type { PrismaClient } from "@prisma/client";
-import prisma from "./DatabaseConnection";
+import { databaseConnection } from '../../index';
 
-export class Seed {
-  constructor(private readonly databaseConnection: PrismaClient) {}
+const seed = async () => {
+  try {
+    databaseConnection.open();
 
-  async createProductCategories(): Promise<void> {
-    const productCategories = await this.databaseConnection.productCategory.createMany({
+    const productCategories = await databaseConnection.productCategory.createMany({
       data: [
         { name: 'Lanche', description: 'Os nossos deliciosos lanches para matar sua fome!' },
         { name: 'Acompanhamento', description: 'Incríveis acompanhamentos que não podem faltar!' },
@@ -13,11 +12,9 @@ export class Seed {
         { name: 'Sobremesa', description: 'Saborosas sobremesas para matar sua vontade!' },
       ],
     });
-    console.log("Created product categories:", productCategories);
-  }
-
-  async createProducts(): Promise<void> {
-    const products = await this.databaseConnection.product.createMany({
+    console.log('Product categories created:', productCategories);
+  
+    const products = await databaseConnection.product.createMany({
       data: [
         { name: 'X-Tudo', description: 'O clássico completo!', price: 34.99, categoryId: 1 },
         { name: 'X-Burger', description: 'O clássico essencial!', price: 22.99, categoryId: 1 },
@@ -29,26 +26,16 @@ export class Seed {
         { name: 'Milkshake', description: 'Delicioso milkshake!', price: 14.99, categoryId: 4 },
       ],
     });
+    console.log('Products created:', products);
+    console.log('Seed successfully executed!');
 
-    console.log("Created products:", products);
+  } catch (error) {
+    console.error('Error executing seed:', error);
+    throw error;
   }
+};
 
-  // async createOrders(): Promise<void> {
-  //   const orders = await this.prisma.order.createMany({
-  //     data: [
-  //       { productId: 1, quantity: 2 },
-  //     ],
-  //   });
-  //   console.log("Created orders:", orders);
-  // }
-
-  async execute(): Promise<void> {
-    await this.createProductCategories();
-    await this.createProducts();
-    // await this.createOrders();
-    this.databaseConnection.$disconnect();
-  }
-}
-
-const seed = new Seed(prisma);
-seed.execute()
+seed().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
