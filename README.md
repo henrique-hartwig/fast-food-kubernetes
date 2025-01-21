@@ -6,11 +6,11 @@ At this thime, I've changed the architecture from Hexagonal to Clean Architectur
 
 The endpoints are for:
 
-- Create, read, update users
 - Create, read, update and delete products
-- Create, read, update and delete categories
-- Create, read, update and delete cart
+- Create, read, update and delete product categories
 - Create, read, update and delete orders
+- Webhook to update the order status
+- Create, read, update users
 - Manage login with CPF
 - Manage order status
 
@@ -64,6 +64,10 @@ Deployment:
 
 Important Notes:
 - Using simple Opaque secrets to store the database password and database url.
+- Check is the API is on making a GET request to http://<address>:<port>/api/health
+- Check is the database is ready to use making a GET request to http://<address>:<port>/api/ready
+- After creating new Order, a Payment will be available to 'be payed'. But there's no payment gateway implemented so a mocked Webhook is used awaiting 10 seconds to simulate the payment. Set 80% of the orders to be paid and other failed.
+- Kept DB Nodeport service to be able to connect to the database from outside the cluster. It's not a good practice to expose the database in this way, but it's for development purposes.
 
 
 ## Folders structure
