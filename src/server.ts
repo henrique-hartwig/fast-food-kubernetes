@@ -1,12 +1,23 @@
 import express from 'express';
 import { routes } from './routes';
 
-export const app = express();
 
-app.use(express.json());
-app.use('/api', routes);
+export interface IHttpServer {
+	listen (port: number): void;
+}
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export class HttpServer implements IHttpServer {
+  private readonly app: express.Application;
+
+  constructor() {
+    this.app = express();
+    this.app.use(express.json());
+    this.app.use('/api', routes);
+  }
+
+  listen(port: number): void {
+    this.app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  }
+}
