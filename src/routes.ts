@@ -1,43 +1,45 @@
 import { Router } from 'express';
-import DatabaseClient from './external/database/DatabaseConnection';
 import healthModule from './modules/HealthModule';
 import productCategoryModule from './modules/ProductCategoryModule';
 import productModule from './modules/ProductModule';
 import orderModule from './modules/OrderModule';
 import paymentModule from './modules/PaymentModule';
 import userModule from './modules/UserModule';
+import type DatabaseConnection from './external/database/DatabaseConnection';
+import type { IHttpServer } from './httpServer';
 
 
-const router = Router();
-export const databaseConnection = new DatabaseClient();
+export const setupRoutes = (server: IHttpServer, databaseConnection: DatabaseConnection) => {
+    const app = server.getApp();
+    const apiRouter = Router();
+    app.use('/api', apiRouter);
 
-const healthController = healthModule(databaseConnection);
-router.get('/health', healthController.healthCheck);
-router.get('/ready', healthController.readyCheck);
+    const healthController = healthModule(databaseConnection);
+    apiRouter.get('/health', (req, res) => healthController.healthCheck(req, res));
+    apiRouter.get('/ready', (req, res) => healthController.readyCheck(req, res));
 
-const orderController = orderModule(databaseConnection);
-router.post('/orders', orderController.createOrder);
-router.get('/orders', orderController.getAllOrders);
-router.get('/orders/:id', orderController.getOrderById);
+    const orderController = orderModule(databaseConnection);
+    apiRouter.post('/orders', (req, res) => orderController.createOrder(req, res));
+    apiRouter.get('/orders', (req, res) => orderController.getAllOrders(req, res));
+    apiRouter.get('/orders/:id', (req, res) => orderController.getOrderById(req, res));
 
-const productCategoryController = productCategoryModule(databaseConnection);
-router.post('/product-categories', productCategoryController.createProductCategory);
-router.get('/product-categories', productCategoryController.getAllProductCategories);
-router.get('/product-categories/:id', productCategoryController.getProductCategoryById);
+    const productCategoryController = productCategoryModule(databaseConnection);
+    apiRouter.post('/product-categories', (req, res) => productCategoryController.createProductCategory(req, res));
+    apiRouter.get('/product-categories', (req, res) => productCategoryController.getAllProductCategories(req, res));
+    apiRouter.get('/product-categories/:id', (req, res) => productCategoryController.getProductCategoryById(req, res));
 
-const productController = productModule(databaseConnection);
-router.post('/products', productController.createProduct);
-router.get('/products', productController.getAllProducts);
-router.get('/products/:id', productController.getProductById);
-router.get('/products/category/:categoryId', productController.getProductsByCategoryId);
-router.put('/products/:id', productController.updateProduct);
-router.delete('/products/:id', productController.deleteProduct);
+    const productController = productModule(databaseConnection);
+    apiRouter.post('/products', (req, res) => productController.createProduct(req, res));
+    apiRouter.get('/products', (req, res) => productController.getAllProducts(req, res));
+    apiRouter.get('/products/:id', (req, res) => productController.getProductById(req, res));
+    apiRouter.get('/products/category/:categoryId', (req, res) => productController.getProductsByCategoryId(req, res));
+    apiRouter.put('/products/:id', (req, res) => productController.updateProduct(req, res));
+    apiRouter.delete('/products/:id', (req, res) => productController.deleteProduct(req, res));
 
-const userController = userModule(databaseConnection);
-router.post('/users', userController.createUser);
-router.get('/users/:cpf', userController.getUserByCpf);
+    const userController = userModule(databaseConnection);
+    apiRouter.post('/users', (req, res) => userController.createUser(req, res));
+    apiRouter.get('/users/:cpf', (req, res) => userController.getUserByCpf(req, res));
 
-const paymentController = paymentModule(databaseConnection);
-router.post('/payments', paymentController.createPayment);
-
-export { router as routes };
+    const paymentController = paymentModule(databaseConnection);
+    apiRouter.post('/payments', (req, res) => paymentController.createPayment(req, res));
+};
