@@ -8,10 +8,10 @@ export default class ProductController {
     try {
       const { name, description, price, categoryId } = req.body;
       await this.productUseCase.createProduct(name, description, price, categoryId);
-      return res.status(201).json({ message: 'Product created successfully!' });
+      res.status(201).json({ message: 'Product created successfully!' });
     } catch (error: any) {
       console.error('Error creating product:', error);
-      return res.status(500).json({ 
+      res.status(500).json({ 
         message: 'Internal server error',
         error: error.message 
       });
@@ -21,13 +21,10 @@ export default class ProductController {
   async getProductById(req: any, res: any) {
     try {
       const product = await this.productUseCase.getProductById(Number(req.params.id));
-      if (product) {
-        return res.status(200).json(product);
-      }
-      return res.status(404).json({ message: 'Product not found' });
+      product ? res.status(200).json(product) : res.status(404).json({ message: 'Product not found' });
     } catch (error: any) {
       console.error('Error searching product:', error);
-      return res.status(500).json({ 
+      res.status(500).json({ 
         message: 'Internal server error',
         error: error.message 
       });
@@ -47,14 +44,13 @@ export default class ProductController {
     }
   }
 
-  async getAllProducts(req: any, res: any) {
+  async getAllProducts(_req: any, res: any): Promise<void> {
     try {
       const products = await this.productUseCase.getAllProducts();
-      console.log('products', products);
-      return res.status(200).json(products);
+      res.status(200).json(products);
     } catch (error: any) {
       console.error('Error searching products:', error);
-      return res.status(500).json({ 
+      res.status(500).json({ 
         message: 'Internal server error',
         error: error.message 
       });
@@ -66,9 +62,9 @@ export default class ProductController {
       const { id } = req.params;
       const productData = req.body;
       const updatedProduct = await this.productUseCase.updateProduct(Number(id), productData);
-      return res.status(200).json(updatedProduct);
+      res.status(200).json(updatedProduct);
     } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     }
   }
 
@@ -76,9 +72,9 @@ export default class ProductController {
     try {
       const { id } = req.params;
       await this.productUseCase.deleteProduct(Number(id));
-      return res.status(200).json({ message: 'Product deleted successfully!' });
+      res.status(200).json({ message: 'Product deleted successfully!' });
     } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     }
   }
 }

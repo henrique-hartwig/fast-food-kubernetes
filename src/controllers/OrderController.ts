@@ -5,6 +5,7 @@ import type { Order } from '../domain/Order';
 
 export class OrderController {
   constructor(private readonly orderUseCase: OrderUseCase, private readonly paymentUseCase: PaymentUseCase) {}
+
   async createOrder(req: any, res: any) {
     try {
       const { items, total, userId } = req.body;
