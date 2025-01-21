@@ -1,8 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 export interface IDatabaseConnection extends PrismaClient {
-    query(query: string): Promise<any[]>;
     close(): void;
+    open(): void;
+    query(query: string): Promise<any[]>;
 }
 
 export default class DatabaseConnection extends PrismaClient implements IDatabaseConnection {
@@ -13,8 +14,12 @@ export default class DatabaseConnection extends PrismaClient implements IDatabas
     this.connection = this;
   }
 
-  query(query: string): Promise<any[]> {
+  async query(query: string): Promise<any[]> {
     return this.connection.$queryRaw<Array<any>>(Prisma.sql`${query}`);
+  }
+
+  open(): void {
+    this.connection.$connect();
   }
 
   close(): void {
