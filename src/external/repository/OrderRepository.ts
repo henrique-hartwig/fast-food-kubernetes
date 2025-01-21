@@ -1,11 +1,12 @@
 import type { IDatabaseConnection } from '../database/DatabaseConnection';
-import { Order } from '../../domain/Order';
+import { Order, type OrderStatus } from '../../domain/Order';
 
 
 export interface IOrderRepository {
   save(order: Order): Promise<Order>;
   findById(id: number): Promise<Order | null>;
   findAll(): Promise<Order[]>;
+  updateStatus(orderId: number, status: Order['status']): Promise<void>;
 }
 
 export class OrderRepository implements IOrderRepository {
@@ -36,5 +37,12 @@ export class OrderRepository implements IOrderRepository {
   async findAll(): Promise<Order[]> {
     const ordersData = await this.databaseConnection.order.findMany();
     return ordersData.map(order => new Order(order.id, order.items as { id: number; quantity: number }[], order.total, order.status as Order['status'], order.userId ?? undefined));
+  }
+
+  async updateStatus(id: number, status: OrderStatus): Promise<void> {
+    await this.databaseConnection.order.update({
+      where: { id },
+      data: { status },
+    });
   }
 }

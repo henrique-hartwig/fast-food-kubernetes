@@ -40,6 +40,7 @@ export const setupRoutes = (server: IHttpServer, databaseConnection: DatabaseCon
     apiRouter.post('/users', (req, res) => userController.createUser(req, res));
     apiRouter.get('/users/:cpf', (req, res) => userController.getUserByCpf(req, res));
 
-    const paymentController = paymentModule(databaseConnection);
+    const { paymentController, webhookController } = paymentModule(databaseConnection);
     apiRouter.post('/payments', (req, res) => paymentController.createPayment(req, res));
+    apiRouter.get('/payments/:paymentId/status', (req, res) => webhookController.handlePaymentUpdate(req, res));
 };

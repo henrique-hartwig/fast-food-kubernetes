@@ -6,7 +6,7 @@ export class OrderUseCase {
   constructor(private orderRepository: IOrderRepository) {}
 
   async createOrder(items: { id: number; quantity: number }[], total: number, userId?: number): Promise<Order> {
-    const order = new Order(Date.now(), items, total, 'received', userId);
+    const order = new Order(Date.now(), items, total, 'pending', userId);
     return this.orderRepository.save(order);
   }
 
