@@ -57,13 +57,14 @@ Deployment:
    ./undeploy.sh
    ```
    
-4. You can use Postman or any other API client to test the endpoints through the NodePort configured at http://localhost:30000
+4. You can use Postman or any other API client to test the endpoints through address returned by the deploy script.
  
- Example: GET http://localhost:30000/api/products
+ Example: GET http://192.168.49.2:32115/api/health
 
 
 Important Notes:
-- Using simple Opaque secrets to store the database password.
+- Using simple Opaque secrets to store the database password and database url.
+
 
 ## Folders structure
 This project aims to use Hexagonal Architecture, so the following folders structure is composed by Ports and Adapters. The Ports work as interfaces/contracts to asure the attributes and methods to interact with other part. The Adapters are the real implementaion of Ports and these Adapters are present in every part of hexagonal architecture.
@@ -72,25 +73,20 @@ It does have that name because is possible have many sides and each side have a 
 The example bellow is only using Order as entity, but its the same concept to others.
 ```
 src/
-├── application/
-│   ├── services/
-│   │   └── OrderService.ts
-│   └── ports/
-│       └── IOrderRepository.ts
+├── controllers/
+│   └── OrderController.ts
 ├── domain/
-│   └── entities/
-│       └── Order.ts
-├── infrastructure/
-│   ├── database/
-│   │   ├── prisma/
-│   │   │   └── prismaClient.ts
-│   │   ├── repository/
-│   │       └── PgOrderRepository.ts
-│   ├── http/
-│   │   └── OrderController.ts
-│   └── config/
-│       └── config.ts
+│   └── Order.ts
+├── external/
+│   └── database/
+│   |    └── DatabaseConnection.ts
+│   └── repository/
+│     └── OrderRepository.ts
+├── modules/
+│   └── OrderModule.ts
+├── usecases/
+│   └── OrderUseCase.ts
 ├── index.ts
-├── server.ts
+├── httpServer.ts
 ├── routes.ts
 ```
