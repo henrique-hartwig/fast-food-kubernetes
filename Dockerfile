@@ -10,7 +10,7 @@ COPY src/ ./src
 COPY tsconfig.json ./
 COPY .env ./
 
-RUN bunx prisma generate --schema=./src/infrastructure/database/prisma/schema.prisma
+RUN bunx prisma generate --schema=./src/external/database/schema.prisma
 
 EXPOSE 3000
 
