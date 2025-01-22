@@ -343,16 +343,24 @@ components:
   schemas:
     OrderInput:
       type: object
+      required:
+        - items
+        - total
+        - payment_method
       properties:
         userId:
           type: integer
           nullable: true
         total:
           type: number
+          description: Valor total do pedido
         items:
           type: array
           items:
             type: object
+            required:
+              - id
+              - quantity
             properties:
               id:
                 type: integer
@@ -364,6 +372,7 @@ components:
           type: string
           enum: [credit_card, debit_card, pix]
           default: credit_card
+          description: Método de pagamento do pedido
 
     OrderOutput:
       type: object
