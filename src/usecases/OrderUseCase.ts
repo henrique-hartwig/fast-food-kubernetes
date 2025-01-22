@@ -20,15 +20,38 @@ export class OrderUseCase {
 
   async getOpenOrders(): Promise<Order[]> {
     const query = `
-        SELECT * FROM public."Order" 
-        WHERE status IN ('received', 'in_preparation', 'ready') 
+        SELECT 
+            o.id,
+            o."createdAt",
+            o."updatedAt",
+            o.status,
+            o."userId",
+            json_agg(
+                json_build_object(
+                    'item', p.name,
+                    'quantity', (items.item->>'quantity')::integer
+                )
+            ) as items
+        FROM public."Order" o,
+            jsonb_array_elements(o.items) as items(item),
+            public."Product" p
+        WHERE 
+            o.status IN ('received', 'in_preparation', 'ready')
+            AND (items.item->>'id')::integer = p.id
+        GROUP BY 
+            o.id,
+            o.total,
+            o."createdAt",
+            o."updatedAt",
+            o.status,
+            o."userId"
         ORDER BY 
-            CASE status 
+            CASE o.status 
                 WHEN 'ready' THEN 1
                 WHEN 'in_preparation' THEN 2
                 WHEN 'received' THEN 3
             END,
-            "createdAt" ASC
+            o."createdAt" ASC
     `;
     const orders = await this.orderRepository.query(query);
     return orders;
