@@ -1,19 +1,61 @@
 openapi: 3.0.0
 info:
   title: API de Gerenciamento de um Fake Fast-Food
-  description: API para gerenciar pedidos, produtos, categorias e usuários
+  description: API para gerenciar pedidos, produtos, categorias, usuários e pagamentos
   version: 1.0.0
   baseUrl: http://localhost:3000/api
 
 paths:
+  /health:
+    get:
+      summary: Verificar saúde do servidor HTTP
+      tags:
+        - Saúde
+      responses:
+        '200':
+          description: Servidor HTTP está saudável
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: The HTTP Server is healthy
+
+  /ready:
+    get:
+      summary: Verificar conexão com banco de dados
+      tags:
+        - Saúde
+      responses:
+        '200':
+          description: Conexão com banco de dados está pronta
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Connection to database is ready
+        '500':
+          description: Conexão com banco de dados não está pronta
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Connection to database is NOT ready
+
   /orders:
     get:
-      summary: Listar todos os pedidos
+      summary: Listar todos os pedidos em aberto
+      description: Retorna pedidos ordenados por status (ready, in_preparation, received) e data de criação
       tags:
         - Pedidos
       responses:
         '200':
           description: Lista de pedidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderOutput'
 
     post:
       summary: Criar novo pedido
@@ -28,6 +70,12 @@ paths:
       responses:
         '201':
           description: Pedido criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderOutput'
+        '500':
+          description: Erro interno do servidor
 
   /orders/{id}:
     get:
@@ -39,10 +87,56 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Pedido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderOutput'
+        '404':
+          description: Pedido não encontrado
+
+  /payments:
+    post:
+      summary: Criar novo pagamento
+      tags:
+        - Pagamentos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '201':
+          description: Pagamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOutput'
+
+  /payments/{paymentId}/status:
+    get:
+      summary: Verificar status do pagamento
+      tags:
+        - Pagamentos
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Status do pagamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOutput'
+        '404':
+          description: Pagamento não encontrado
 
   /product-categories:
     get:
@@ -52,6 +146,12 @@ paths:
       responses:
         '200':
           description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryOutput'
 
     post:
       summary: Criar nova categoria de produto
@@ -77,10 +177,16 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Categoria encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryOutput'
+        '404':
+          description: Categoria não encontrada
 
   /products:
     get:
@@ -90,6 +196,12 @@ paths:
       responses:
         '200':
           description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductOutput'
 
     post:
       summary: Criar novo produto
@@ -115,10 +227,16 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOutput'
+        '404':
+          description: Produto não encontrado
           
     put:
       summary: Atualizar produto
@@ -129,7 +247,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -139,6 +257,12 @@ paths:
       responses:
         '200':
           description: Produto atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOutput'
+        '400':
+          description: Erro na requisição
           
     delete:
       summary: Deletar produto
@@ -149,10 +273,12 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
-        '204':
-          description: Produto deletado
+        '200':
+          description: Produto deletado com sucesso
+        '400':
+          description: Erro na requisição
 
   /products/category/{categoryId}:
     get:
@@ -164,10 +290,16 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Lista de produtos da categoria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductOutput'
 
   /users:
     post:
@@ -183,6 +315,8 @@ paths:
       responses:
         '201':
           description: Usuário criado com sucesso
+        '500':
+          description: Erro interno do servidor
 
   /users/{cpf}:
     get:
@@ -198,6 +332,12 @@ paths:
       responses:
         '200':
           description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOutput'
+        '404':
+          description: Usuário não encontrado
 
 components:
   schemas:
@@ -205,7 +345,7 @@ components:
       type: object
       properties:
         userId:
-          type: string
+          type: integer
           nullable: true
         total:
           type: number
@@ -215,11 +355,77 @@ components:
             type: object
             properties:
               id:
-                type: string
+                type: integer
                 description: ID do produto
               quantity:
-                type: number
+                type: integer
                 description: Quantidade do produto
+        paymentMethod:
+          type: string
+          enum: [credit_card, debit_card, pix]
+          default: credit_card
+
+    OrderOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              item:
+                type: string
+              quantity:
+                type: integer
+        total:
+          type: number
+        status:
+          type: string
+          enum: [pending, received, in_preparation, ready, finished]
+        userId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentInput:
+      type: object
+      properties:
+        orderId:
+          type: integer
+        paymentMethod:
+          type: string
+          enum: [credit_card, debit_card, pix]
+        amount:
+          type: number
+
+    PaymentOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderId:
+          type: integer
+        status:
+          type: string
+          enum: [pending, paid, failed]
+        paymentMethod:
+          type: string
+          enum: [credit_card, debit_card, pix]
+        amount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     CategoryInput:
       type: object
@@ -228,6 +434,22 @@ components:
           type: string
         description:
           type: string
+
+    CategoryOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     ProductInput:
       type: object
@@ -239,14 +461,51 @@ components:
         price:
           type: number
         categoryId:
+          type: integer
+
+    ProductOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
           type: number
+        categoryId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     UserInput:
       type: object
+      required:
+        - name
+        - email
+        - cpf
       properties:
         name:
           type: string
+        email:
+          type: string
+          format: email
         cpf:
+          type: string
+          pattern: ^\d{11}$
+          description: CPF com 11 dígitos numéricos
+
+    UserOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
           type: string
         email:
           type: string
