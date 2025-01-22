@@ -10,6 +10,6 @@ export class HealthController {
 
   async readyCheck(_req: Request, res: Response): Promise<void> {
     const result = await this.healthUseCase.readyCheck();
-    result ? res.status(200).send('ok') : res.status(500).send('error');
+    result ? res.status(200).send('Connection to database is ready') : res.status(500).send('Connection to database is NOT ready');
   }
 }
