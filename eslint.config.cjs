@@ -15,6 +15,8 @@ module.exports = [
     },
     rules: {
       ...typescript.configs['recommended'].rules,
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-expressions': 'warn',
     },
   },
   {
