@@ -8,7 +8,6 @@ RUN bun install
 
 COPY src/ ./src
 COPY tsconfig.json ./
-COPY .env ./
 
 RUN bunx prisma generate --schema=./src/external/database/schema.prisma
 
