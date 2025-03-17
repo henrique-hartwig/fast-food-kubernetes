@@ -1,4 +1,3 @@
-import type { Payment } from "../domain/Payment";
 import type { PaymentUseCase } from "../usecases/PaymentUseCase";
 
 export class PaymentController {
