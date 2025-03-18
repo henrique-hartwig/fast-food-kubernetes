@@ -1,0 +1,9 @@
+services:
+  postgres_test:
+    image: postgres:latest
+    ports:
+      - "5454:5432"
+    environment:
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+      - POSTGRES_DB=test_db
