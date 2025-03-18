@@ -8,7 +8,15 @@
     "lint": "eslint --fix .",
     "generate": "bunx prisma generate --schema=./src/external/database/schema.prisma",
     "migrate": "bunx prisma migrate dev --schema=./src/external/database/schema.prisma",
-    "seed": "bun src/external/database/seed.ts"
+    "seed": "bun src/external/database/seed.ts",
+    "test": "bun test",
+    "test:unit": "bun test tests/unit/**/*.spec.ts",
+    "test:integration:setup": "docker compose -f docker-compose.test.yml up -d && sleep 2",
+    "test:integration:migrate": "dotenv -e .env.test -- bunx prisma migrate deploy --schema=./src/external/database/schema.prisma",
+    "test:integration:run": "dotenv -e .env.test -- bun test tests/integration/**/*.spec.ts",
+    "test:integration:teardown": "docker compose -f docker-compose.test.yml down -v",
+    "test:integration": "bun test:integration:setup && bun test:integration:migrate && bun test:integration:run && bun test:integration:teardown",
+    "pretest:integration": "docker compose -f docker-compose.test.yml down -v"
   },
   "peerDependencies": {
     "typescript": "^5.6.3"
@@ -17,6 +25,7 @@
     "@prisma/client": "^5.21.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.7",
+    "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.10.0",
     "dotenv": "^16.4.5",
@@ -24,6 +33,8 @@
     "express": "^4.21.1"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "dotenv-cli": "^8.0.0",
+    "supertest": "^6.3.3"
   }
 }
