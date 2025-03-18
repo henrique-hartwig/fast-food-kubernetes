@@ -22,16 +22,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
+          bun-version: latest
           
       - name: Install dependencies
-        run: npm install
+        run: bun install
         
       - name: Run ESLint
-        run: npm run lint
+        run: bun run lint
 
   tests:
     needs: code-analysis
@@ -54,24 +54,25 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
+          bun-version: latest
           
       - name: Install dependencies
-        run: npm install
+        run: bun install
         
       - name: Run unit tests
-        run: npm run test:unit
+        run: bun test:unit
 
       - name: Setup test database
         run: |
           echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5454/test_db?schema=public" > .env.test
-          npm run test:integration:migrate
+          bun run generate
+          bun run test:integration:migrate
         
       - name: Run integration tests
-        run: npm run test:integration:run
+        run: bun run test:integration:run
 
   build-and-push:
     if: github.event_name == 'pull_request' && github.base_ref == 'develop'
@@ -116,9 +117,9 @@ jobs:
       - name: Generate version based on branch
         run: |
           if [[ "${{ github.head_ref }}" == "develop" ]]; then
-            npm version minor -m "Bump version to %s [skip ci]"
+            bun run version minor -m "Bump version to %s [skip ci]"
           elif [[ "${{ github.head_ref }}" == hotfix/* ]]; then
-            npm version patch -m "Bump version to %s [skip ci]"
+            bun run version patch -m "Bump version to %s [skip ci]"
           fi
           git push && git push --tags
 
