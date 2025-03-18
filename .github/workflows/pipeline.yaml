@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - '*'
-      - '!master'
       - '!develop'
+      - 'master'
   pull_request:
     branches:
       - master
@@ -75,7 +75,7 @@ jobs:
         run: bun run test:integration:run
 
   build-and-push:
-    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
+    if: github.event_name == 'pull_request' && (github.base_ref == 'develop' || github.base_ref == 'master')
     needs: tests
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +101,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   version-and-deploy:
-    if: github.event.pull_request.merged == true && github.base_ref == 'master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: tests
     runs-on: ubuntu-latest
     steps:
