@@ -68,6 +68,7 @@ jobs:
       - name: Setup test database
         run: |
           echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5454/test_db?schema=public" > .env.test
+          bun run generate
           bun run test:integration:migrate
         
       - name: Run integration tests
