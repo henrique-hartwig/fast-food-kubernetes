@@ -1,9 +1,15 @@
-name: Build and Push to ECR
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ develop, master ]
-  workflow_dispatch:
+    branches:
+      - '*'
+      - '!master'
+      - '!develop'
+  pull_request:
+    branches:
+      - master
+      - develop
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -11,11 +17,68 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build:
+  code-analysis:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run ESLint
+        run: npm run lint
+
+  tests:
+    needs: code-analysis
+    runs-on: ubuntu-latest
+    services:
+      postgres_test:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5454:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Setup test database
+        run: |
+          echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5454/test_db?schema=public" > .env.test
+          npm run test:integration:migrate
+        
+      - name: Run integration tests
+        run: npm run test:integration:run
+
+  build-and-push:
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -34,6 +97,49 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  version-and-deploy:
+    if: github.event.pull_request.merged == true && github.base_ref == 'master'
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+
+      - name: Generate version based on branch
+        run: |
+          if [[ "${{ github.head_ref }}" == "develop" ]]; then
+            npm version minor -m "Bump version to %s [skip ci]"
+          elif [[ "${{ github.head_ref }}" == hotfix/* ]]; then
+            npm version patch -m "Bump version to %s [skip ci]"
+          fi
+          git push && git push --tags
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push production image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
