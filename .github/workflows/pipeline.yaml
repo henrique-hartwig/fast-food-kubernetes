@@ -120,10 +120,15 @@ jobs:
 
       - name: Generate version based on branch
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          MERGE_MESSAGE=$(git log -1 --pretty=%B)
+          if echo "$MERGE_MESSAGE" | grep -q "Merge pull request .* from .*/develop"; then
+            echo "PR merged from develop branch - generating minor version"
             bun run release:minor
-          elif [[ "${{ github.ref }}" =~ ^refs/heads/hotfix/ ]]; then
+          elif echo "$MERGE_MESSAGE" | grep -q "Merge pull request .* from .*/hotfix/"; then
+            echo "PR merged from hotfix branch - generating patch version"
             bun run release:patch
+          else
+            echo "No version generation needed"
           fi
           git push --follow-tags
 
