@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - '*'
-      - '!develop'
+      - 'develop'
       - 'master'
   pull_request:
     branches:
@@ -107,12 +107,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Configure Git
+
+      - name: Setup Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -120,9 +121,9 @@ jobs:
       - name: Generate version based on branch
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-            bun run version minor -m "Bump version to %s [skip ci]"
+            bun run release:minor
           elif [[ "${{ github.ref }}" =~ ^refs/heads/hotfix/ ]]; then
-            bun run version patch -m "Bump version to %s [skip ci]"
+            bun run release:patch
           fi
           git push --follow-tags
 

@@ -17,7 +17,9 @@
     "test:integration:run": "dotenv -e .env.test -- bun test tests/integration/**/*.spec.ts",
     "test:integration:teardown": "docker compose -f docker-compose.test.yml down -v",
     "test:integration": "bun test:integration:setup && bun test:integration:migrate && bun test:integration:run && bun test:integration:teardown",
-    "pretest:integration": "docker compose -f docker-compose.test.yml down -v"
+    "pretest:integration": "docker compose -f docker-compose.test.yml down -v",
+    "release:minor": "release-it minor --ci --no-git.requireCleanWorkingDir",
+    "release:patch": "release-it patch --ci --no-git.requireCleanWorkingDir"
   },
   "peerDependencies": {
     "typescript": "^5.6.3"
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "dotenv-cli": "^8.0.0",
+    "release-it": "^18.1.2",
     "supertest": "^6.3.3"
   }
 }
